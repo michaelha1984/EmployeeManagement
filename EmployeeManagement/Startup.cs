@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagement
 {
@@ -27,7 +28,7 @@ namespace EmployeeManagement
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -36,13 +37,28 @@ namespace EmployeeManagement
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
+            app.Use(async (context, next) =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync(config["MyKey"]);
-                });
+                logger.LogInformation("MW1: In");
+                await next();
+                logger.LogInformation("MW1: Out");
             });
+
+
+            app.Use(async (context, next) =>
+            {
+                logger.LogInformation("MW2: In");
+                await next();
+                logger.LogInformation("MW2: Out");
+            });
+
+            app.Run(async (context) =>
+            {
+                logger.LogInformation("MW3: In");
+                await context.Response.WriteAsync("Hello World");
+                logger.LogInformation("MW3: Out");
+            });
+
         }
     }
 }
