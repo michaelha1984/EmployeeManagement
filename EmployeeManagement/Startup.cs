@@ -37,13 +37,11 @@ namespace EmployeeManagement
 
             app.UseRouting();
 
-            var defaultFileOptions = new DefaultFilesOptions();
-            defaultFileOptions.DefaultFileNames.Clear();
-            defaultFileOptions.DefaultFileNames.Add("foo.html");
+            var fileServerOptions = new FileServerOptions();
+            fileServerOptions.DefaultFilesOptions.DefaultFileNames.Clear();
+            fileServerOptions.DefaultFilesOptions.DefaultFileNames.Add("foo.html");
 
-            app.UseDefaultFiles(defaultFileOptions);
-
-            app.UseStaticFiles();
+            app.UseFileServer(fileServerOptions);
         }
     }
 }
