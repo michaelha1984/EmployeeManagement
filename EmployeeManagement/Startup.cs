@@ -32,20 +32,14 @@ namespace EmployeeManagement
         {
             if (env.IsDevelopment())
             {
-                var developerExceptionPageOptions = new DeveloperExceptionPageOptions
-                {
-                    SourceCodeLineCount = 1
-                };
-
-                app.UseDeveloperExceptionPage(developerExceptionPageOptions);
+                app.UseDeveloperExceptionPage();
             }
                         
-            app.UseFileServer();
+            app.UseStaticFiles();
 
             app.Run(async context =>
             {
-                throw new Exception("Exception");
-                await context.Response.WriteAsync("Hello World");
+                await context.Response.WriteAsync("Hosting Env: " + env.EnvironmentName);
             });
         }
     }
