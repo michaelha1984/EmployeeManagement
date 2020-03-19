@@ -19,5 +19,11 @@ namespace EmployeeManagement.Controllers
         {
             return employeeRepository.GetEmployee(1).Name;
         }
+
+        public ObjectResult Details()
+        {
+            var model = employeeRepository.GetEmployee(1);
+            return new ObjectResult(model);
+        }
     }
 }
