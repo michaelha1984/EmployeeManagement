@@ -28,7 +28,7 @@ namespace EmployeeManagement
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -37,28 +37,13 @@ namespace EmployeeManagement
 
             app.UseRouting();
 
-            app.Use(async (context, next) =>
-            {
-                logger.LogInformation("MW1: In");
-                await next();
-                logger.LogInformation("MW1: Out");
-            });
+            var defaultFileOptions = new DefaultFilesOptions();
+            defaultFileOptions.DefaultFileNames.Clear();
+            defaultFileOptions.DefaultFileNames.Add("foo.html");
 
+            app.UseDefaultFiles(defaultFileOptions);
 
-            app.Use(async (context, next) =>
-            {
-                logger.LogInformation("MW2: In");
-                await next();
-                logger.LogInformation("MW2: Out");
-            });
-
-            app.Run(async (context) =>
-            {
-                logger.LogInformation("MW3: In");
-                await context.Response.WriteAsync("Hello World");
-                logger.LogInformation("MW3: Out");
-            });
-
+            app.UseStaticFiles();
         }
     }
 }
