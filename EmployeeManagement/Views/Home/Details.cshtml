@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Employee Details";
 }
-m
+
 <div>
     Name: @Model.Employee.Name
 </div>
@@ -14,4 +14,8 @@ m
 <div>
     Department: @Model.Employee.Department
 </div>
+
+@section Scripts {
+    <script src="~/js/CustomScript.js"></script>
+}
 
