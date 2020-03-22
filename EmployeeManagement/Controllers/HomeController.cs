@@ -16,17 +16,18 @@ namespace EmployeeManagement.Controllers
         {
             this.employeeRepository = employeeRepository;
         }
+        
         public ViewResult Index()
         {
             var model = employeeRepository.GetAllEmployees();
             return View(model);
         }
 
-        public ViewResult Details()
+        public ViewResult Details(int id)
         {
             var homeDetailsViewModel = new HomeDetailsViewModel() 
             {
-                Employee = employeeRepository.GetEmployee(1),
+                Employee = employeeRepository.GetEmployee(id),
                 PageTitle = "Employee Details"
             };
 
