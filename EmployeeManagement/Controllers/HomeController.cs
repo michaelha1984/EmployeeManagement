@@ -51,15 +51,18 @@ namespace EmployeeManagement.Controllers
             if (ModelState.IsValid)
             {
                 string fileName = null;
-                if (model.Photo != null)
+                if (model.Photos != null && model.Photos.Count > 0)
                 {
-                    var uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
-                    fileName = Guid.NewGuid().ToString() + "_" + model.Photo.FileName;
-                    var filePath = Path.Combine(uploadsFolder, fileName);
+                    foreach (var photo in model.Photos)
+                    {
+                        var uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                        fileName = Guid.NewGuid().ToString() + "_" + photo.FileName;
+                        var filePath = Path.Combine(uploadsFolder, fileName);
 
-                    var fileStream = new FileStream(filePath, FileMode.Create);
+                        var fileStream = new FileStream(filePath, FileMode.Create);
 
-                    model.Photo.CopyTo(fileStream);
+                        photo.CopyTo(fileStream);
+                    }
 
                 }
 
