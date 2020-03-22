@@ -32,7 +32,7 @@ namespace EmployeeManagement
 
             services.AddMvc(option => option.EnableEndpointRouting = false)
                 .AddXmlDataContractSerializerFormatters();
-            services.AddSingleton<IEmployeeRepository, MockEmployeeRepository>();
+            services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
