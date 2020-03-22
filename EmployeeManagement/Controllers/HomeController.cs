@@ -52,6 +52,7 @@ namespace EmployeeManagement.Controllers
             var model = new EmployeeEditViewModel
             {
                 Id = employee.Id,
+                Name = employee.Name,
                 Email = employee.Email,
                 Department = employee.Department,
                 ExistingPhotoPath = employee.PhotoPath
@@ -66,19 +67,16 @@ namespace EmployeeManagement.Controllers
             if (ModelState.IsValid)
             {
                 string fileName = null;
-                if (model.Photos != null && model.Photos.Count > 0)
+                if (model.Photo != null)
                 {
-                    foreach (var photo in model.Photos)
+                    var uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                    fileName = Guid.NewGuid().ToString() + "_" + model.Photo.FileName;
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        var uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
-                        fileName = Guid.NewGuid().ToString() + "_" + photo.FileName;
-                        var filePath = Path.Combine(uploadsFolder, fileName);
-
-                        var fileStream = new FileStream(filePath, FileMode.Create);
-
-                        photo.CopyTo(fileStream);
+                        model.Photo.CopyTo(fileStream);
                     }
-
                 }
 
                 var newEmployee = new Employee
@@ -92,6 +90,44 @@ namespace EmployeeManagement.Controllers
 
                 employeeRepository.AddEmployee(newEmployee);
                 return RedirectToAction("details", new { id = newEmployee.Id });
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Edit(EmployeeEditViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var employee = employeeRepository.GetEmployee(model.Id);
+                employee.Name = model.Name;
+                employee.Email = model.Email;
+                employee.Department = model.Department;
+
+                string fileName = null;
+                if (model.Photo != null)
+                {
+                    if (model.ExistingPhotoPath != null)
+                    {
+                        var existingFilePath = Path.Combine(webHostEnvironment.WebRootPath, "images", model.ExistingPhotoPath);
+                        System.IO.File.Delete(existingFilePath);
+                    }
+
+                    var uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                    fileName = Guid.NewGuid().ToString() + "_" + model.Photo.FileName;
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        model.Photo.CopyTo(fileStream);
+                    }
+
+                    employee.PhotoPath = fileName;
+                }
+                
+                employeeRepository.UpdateEmployee(employee);
+                return RedirectToAction("details", new { id = employee.Id });
             }
 
             return View();
