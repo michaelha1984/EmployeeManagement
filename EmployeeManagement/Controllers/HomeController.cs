@@ -17,6 +17,9 @@ namespace EmployeeManagement.Controllers
             this.employeeRepository = employeeRepository;
         }
         
+        [Route("")]
+        [Route("Home")]
+        [Route("Home/Index")]
         public ViewResult Index()
         {
             var model = employeeRepository.GetAllEmployees();
