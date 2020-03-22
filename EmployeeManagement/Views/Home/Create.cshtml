@@ -22,7 +22,11 @@
         <div class="form-group row">
             <label asp-for="Department" class="col-sm-2 col-form-label"></label>
             <div class="col-sm-10">
-                <select asp-for="Department" asp-items="Html.GetEnumSelectList<Dept>()" class="form-control" placeholder="Department"></select>
+                <select asp-for="Department" asp-items="Html.GetEnumSelectList<Dept>()" class="form-control" placeholder="Department">
+                    <option value="">Please select</option>
+                </select>
+                <span asp-validation-for="Department" class="text-danger"></span>
+
             </div>
         </div>
 
