@@ -5,16 +5,22 @@
 }
 
     <form asp-controller="Home" asp-action="Create" method="post">
-        <div>
-            <label asp-for="Name"></label>
-            <input asp-for="Name" />
+        <div class="form-group row">
+            <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="Name" class="form-control" placeholder="Name" />
+            </div>
         </div>
-        <div>
-            <label asp-for="Email"></label>
-            <input asp-for="Email" />
+        <div class="form-group row">
+            <label asp-for="Email" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="Email" class="form-control" placeholder="Email"/>
+            </div>
         </div>
-        <div>
-            <label asp-for="Department"></label>
-            <select asp-for="Department" asp-items="Html.GetEnumSelectList<Dept>()"></select>
+        <div class="form-group row">
+            <label asp-for="Department" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <select asp-for="Department" asp-items="Html.GetEnumSelectList<Dept>()" class="form-control" placeholder="Department"></select>
+            </div>
         </div>
     </form>
