@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.Controllers
 {
+    [Route("[controller]/[action]")]
     public class HomeController : Controller
     {
         private readonly IEmployeeRepository employeeRepository;
@@ -17,20 +18,20 @@ namespace EmployeeManagement.Controllers
             this.employeeRepository = employeeRepository;
         }
         
-        [Route("")]
-        [Route("Home")]
-        [Route("Home/Index")]
+        [Route("~/Home")]
+        [Route("~/")]
         public ViewResult Index()
         {
             var model = employeeRepository.GetAllEmployees();
             return View(model);
         }
 
-        public ViewResult Details(int id)
+        [Route("{id?}")]
+        public ViewResult Details(int? id)
         {
             var homeDetailsViewModel = new HomeDetailsViewModel() 
             {
-                Employee = employeeRepository.GetEmployee(id),
+                Employee = employeeRepository.GetEmployee(id ?? 1),
                 PageTitle = "Employee Details"
             };
 
