@@ -1,11 +1,14 @@
-﻿@model EmployeeCreateViewModel
+﻿@model EmployeeEditViewModel
 @inject IEmployeeRepository _employeeRepository
 
 @{ 
-    ViewBag.Title = "Create Employee";
+    ViewBag.Title = "Edit Employee";
+    var photoPath = "~/images/" + (Model.ExistingPhotoPath ?? "noimage.jpg");
 }
 
-    <form  enctype="multipart/form-data" asp-controller="Home" asp-action="Create" method="post">
+    <form enctype="multipart/form-data" asp-controller="Home" asp-action="Edit" method="post">
+        <input hidden asp-for="Id" />
+        <input hidden asp-for="ExistingPhotoPath" />
         <div class="form-group row">
             <label asp-for="Name" class="col-sm-2 col-form-label"></label>
             <div class="col-sm-10">
@@ -36,16 +39,21 @@
             <div class="col-sm-10">
                 <div class="custom-file">
                     <input asp-for="Photo" class="form-control custom-file-input" placeholder="Email" />
-                    <label class="custom-file-label">Choose File...</label>
+                    <label class="custom-file-label">Click here to change photo</label>
                 </div>
             </div>
+        </div>
+
+        <div class="form-group row col-sm-4 offset-4">
+            <img class="imageThumbnail" src="@photoPath" asp-append-version="true" />
         </div>
 
         <div asp-validation-summary="All" class="text-danger"></div>
 
         <div class="form-group row">
             <div class="col-sm-10">
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a asp-controller="home" asp-action="index" class="btn btn-primary">Cancel</a>
             </div>
         </div>
 
