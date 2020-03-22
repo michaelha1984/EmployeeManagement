@@ -1,8 +1,10 @@
-﻿@{ 
-    ViewBag.Title = "Not Found";    
+﻿@{
+    ViewBag.Title = "Not Found";
 }
 
 <h1>@ViewBag.ErrorMessage</h1>
+<h1>@ViewBag.Path</h1>
+<h1>@ViewBag.QueryString</h1>
 
 <a asp-action="index" asp-controller="home">
     Click here to navigate back to the home page.
