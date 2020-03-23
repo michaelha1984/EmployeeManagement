@@ -52,6 +52,14 @@ namespace EmployeeManagement.Controllers
 
                 if (result.Succeeded)
                 {
+                    var isSigned = signInManager.IsSignedIn(User);
+                    var isAdmin = User.IsInRole("Admin"); // Current user
+
+                    if (isSigned && isAdmin) 
+                    {
+                        return RedirectToAction("ListUsers", "Administration");
+                    }
+
                     await signInManager.SignInAsync(user, isPersistent: false);
 
                     return RedirectToAction("index", "home");

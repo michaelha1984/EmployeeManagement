@@ -25,6 +25,12 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpGet]
+        public IActionResult ListUsers()
+        {
+            var users = userManager.Users;
+            return View(users);
+        }
+
         public IActionResult CreateRole()
         {
             return View();
@@ -146,7 +152,7 @@ namespace EmployeeManagement.Controllers
                     UserName = user.UserName
                 };
 
-                var isInRole = await userManager.IsInRoleAsync(user, role.Name);
+                var isInRole = await userManager.IsInRoleAsync(user, role.Name); // Provided user (not current user)
                 if (isInRole)
                 {
                     model.IsSelected = true;
