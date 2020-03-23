@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity;
-@inject SignInManager<IdentityUser> signInManager;
+@inject SignInManager<ApplicationUser> signInManager;
 
 <!DOCTYPE html>
 
@@ -9,6 +9,8 @@
     <environment include="Development">
         <link href="~/lib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" />
         <script src="~/lib/jquery/jquery.js"></script>
+        <script src="~/lib/jquery-validate/jquery.validate.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
         <script src="~/lib/twitter-bootstrap/js/bootstrap.js"></script>
     </environment>
     <environment exclude="Development">
@@ -25,7 +27,7 @@
 </head>
 <body>
     <div class="container">
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark mb-2">
             <a class="navbar-brand" asp-action="index" asp-controller="home">
                 <img src="~/images/brand.png" height="30" width="30" />
             </a>
@@ -40,6 +42,21 @@
                     <li class="=" nav-item>
                         <a asp-action="create" asp-controller="home" class="nav-link">Create</a>
                     </li>
+                    @if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Manage
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a asp-action="ListUsers" asp-controller="Administration"
+                                   class="dropdown-item">Users</a>
+                                <a asp-action="ListRoles" asp-controller="Administration"
+                                   class="dropdown-item">Roles</a>
+                            </div>
+                        </li>
+                    }
                 </ul>
                 <ul class="navbar-nav ml-auto">
                     @if (signInManager.IsSignedIn(User))
@@ -64,7 +81,6 @@
                 </ul>
             </div>
         </nav>
-        <h3>@ViewBag.Title</h3>
         <div class="container">
             @RenderBody()
         </div>

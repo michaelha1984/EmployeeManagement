@@ -5,12 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using EmployeeManagement.Models;
 using EmployeeManagement.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagement.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IEmployeeRepository employeeRepository;
@@ -25,13 +27,16 @@ namespace EmployeeManagement.Controllers
             this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
         }
-    
+
+
+        [AllowAnonymous]
         public ViewResult Index()
         {
             var model = employeeRepository.GetAllEmployees();
             return View(model);
         }
 
+        [AllowAnonymous]
         public ViewResult Details(int? id)
         {
             var employee = employeeRepository.GetEmployee(id.Value);
