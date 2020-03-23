@@ -91,5 +91,21 @@ namespace EmployeeManagement.Controllers
 
             return View(model);
         }
+
+        [HttpPost][HttpGet]
+        [AllowAnonymous]
+        // Mvc uses jquery validate method (using an AJAX call) to call server side method.
+        // Hence why we need to return a json result.
+        public async Task<IActionResult> IsEmailInUse(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return Json(true);
+            }
+
+            return Json($"Email {email} is already in use.");
+        }
     }
 }
