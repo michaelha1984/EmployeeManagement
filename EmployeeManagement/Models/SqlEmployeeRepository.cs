@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,10 +9,13 @@ namespace EmployeeManagement.Models
     public class SqlEmployeeRepository : IEmployeeRepository
     {
         private readonly AppDbContext context;
+        private readonly ILogger<SqlEmployeeRepository> logger;
 
-        public SqlEmployeeRepository(AppDbContext context)
+        public SqlEmployeeRepository(AppDbContext context,
+            ILogger<SqlEmployeeRepository> logger)
         {
             this.context = context;
+            this.logger = logger;
         }
 
         public Employee AddEmployee(Employee employee)
