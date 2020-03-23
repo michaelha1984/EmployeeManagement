@@ -80,7 +80,7 @@ namespace EmployeeManagement.Controllers
                 {
                     if (!string.IsNullOrEmpty(returnUrl))
                     {
-                        return Redirect(returnUrl);
+                        return LocalRedirect(returnUrl);
                     }
                      
                     return RedirectToAction("index", "home");
