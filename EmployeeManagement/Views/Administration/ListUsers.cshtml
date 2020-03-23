@@ -6,7 +6,6 @@
 
 @if (Model.Any())
 {
-
     <a asp-controller="Account" asp-action="Register" class="btn btn-primary mb-3" style="width: auto;">
         Add new user
     </a>
@@ -22,7 +21,7 @@
             </div>
             <div class="card-footer">
                 <form asp-controller="Administration" asp-action="DeleteUser" asp-route-id="@user.Id" method="post">
-                    <a asp-controller="Administration" asp-action="EditUser" asp-route-id="@user.Id" class="btn btn-danger">Edit</a>
+                    <a asp-controller="Administration" asp-action="EditUser" asp-route-id="@user.Id" class="btn btn-primary">Edit</a>
                     <span id="confirmDeleteSpan_@user.Id" style="display: none">
                         <span>Are you sure you want to delete?</span>
                         <button type="submit" class="btn btn-danger">Yes</button>
