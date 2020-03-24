@@ -50,6 +50,14 @@ namespace EmployeeManagement
                 options.EnableEndpointRouting = false;
             }).AddXmlDataContractSerializerFormatters();
 
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    //TODO: Secrets manager
+                    options.ClientId = "585158669575-18uo27mfsijjuue1l13t7i8df5tpiemu.apps.googleusercontent.com";
+                    options.ClientSecret = "f6KQMzHkYdASrMAj3TiXjkTF";
+                });
+
             services.ConfigureApplicationCookie(options =>
             {
                 options.AccessDeniedPath = new PathString("/Administration/AccessDenied");
