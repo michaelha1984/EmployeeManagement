@@ -54,6 +54,9 @@ namespace EmployeeManagement
                 options.AddPolicy("DeleteRolePolicy", policy =>
                     policy.RequireClaim("Delete Role")
                         .RequireClaim("Create Role"));
+
+                options.AddPolicy("AdminRolePolicy", policy =>
+                    policy.RequireRole("Admin"));
             });
 
             services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
