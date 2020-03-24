@@ -57,10 +57,14 @@ namespace EmployeeManagement
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("DeleteRolePolicy", policy =>
-                    policy.RequireClaim("Delete Role", "true"));
+                    policy.RequireAssertion(context =>
+                        context.User.IsInRole("Admin") && context.User.HasClaim(c => c.Type == "Delete Role" && c.Value == "true") ||
+                        context.User.IsInRole("Super Admin")));
 
                 options.AddPolicy("EditRolePolicy", policy =>
-                    policy.RequireClaim("Edit Role", "true"));
+                    policy.RequireAssertion(context =>
+                        context.User.IsInRole("Admin") && context.User.HasClaim(c => c.Type == "Edit Role" && c.Value == "true") ||
+                        context.User.IsInRole("Super Admin")));
 
                 options.AddPolicy("AdminRolePolicy", policy =>
                     policy.RequireRole("Admin"));
