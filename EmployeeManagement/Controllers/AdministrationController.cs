@@ -478,5 +478,13 @@ namespace EmployeeManagement.Controllers
 
             return RedirectToAction("EditUser", new { Id = userId });
         }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }

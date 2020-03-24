@@ -122,11 +122,5 @@ namespace EmployeeManagement.Controllers
             return Json($"Email {email} is already in use.");
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
     }
 }
