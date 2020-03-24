@@ -107,7 +107,6 @@ namespace EmployeeManagement.Controllers
             return View(model);
         }
 
-
         [HttpPost]
         [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> EditRoleAsync(EditRoleViewModel model)
@@ -341,6 +340,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> ManageUserRoles(string userId)
         {
             ViewBag.UserId = userId;
@@ -377,6 +377,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> ManageUserRoles(List<ManageUserRolesViewModel> modelList, string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
