@@ -1,2 +1,11 @@
-﻿<h3>An exception error occured while processing your request.</h3>
+﻿@if (ViewBag.ErrorTitle == null)
+{
+    <h3>An exception error occured while processing your request.</h3>
+}
+else
+{
+    <h1 class="text-danger">@ViewBag.Title</h1>
+    <h1 class="text-danger">@ViewBag.ErrorMessage</h1>
+}
+
 
