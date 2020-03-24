@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using EmployeeManagement.Models;
 using EmployeeManagement.ViewModels;
@@ -77,9 +78,15 @@ namespace EmployeeManagement.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Login()
+        public async Task<IActionResult> Login(string returnUrl)
         {
-            return View();
+            var model = new LoginViewModel
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+
+            return View(model);
         }
 
         [HttpPost]
@@ -122,11 +129,84 @@ namespace EmployeeManagement.Controllers
             return Json($"Email {email} is already in use.");
         }
 
-        [HttpGet]
+        [HttpPost]
         [AllowAnonymous]
-        public IActionResult AccessDenied()
+        public IActionResult ExternalLogin(string provider, string returnUrl)
         {
-            return View();
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+
+            var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            // Redirect to external (google) login
+            return new ChallengeResult(provider, properties);
+        }
+
+        [AllowAnonymous]
+        // This will be called after successfully logged into external (google) login 
+        public async Task<IActionResult> ExternalLoginCallbackAsync(string returnUrl = null, string remoteError = null)
+        {
+            returnUrl = returnUrl ?? Url.Content("~/"); // root url
+
+            var model = new LoginViewModel
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+
+            if (remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
+                return View("Login", model);
+            }
+
+            var info = await signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error loading external login information: {remoteError}");
+                return View("Login", model);
+            }
+
+            // Try sign in with external login details 
+            var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+            if (result.Succeeded)
+            {
+                // We already have this person's login. Do nothing more.
+                return LocalRedirect(returnUrl);
+            }
+            else
+            { 
+                var email = info.Principal.FindFirst(ClaimTypes.Email).Value;
+
+                if (email != null)
+                {
+                    var user = await userManager.FindByEmailAsync(email);
+
+                    if (user == null)
+                    {
+                        // Create a new user
+                        user = new ApplicationUser
+                        {
+                            UserName = info.Principal.FindFirst(ClaimTypes.Email).Value,
+                            Email = info.Principal.FindFirst(ClaimTypes.Email).Value
+                        };
+
+                        await userManager.CreateAsync(user);
+                    }
+
+                    // Add user to login and sign in
+                    await userManager.AddLoginAsync(user, info);
+                    await signInManager.SignInAsync(user, isPersistent: false);
+
+                    return LocalRedirect(returnUrl);
+                }
+
+                ViewBag.ErrorTitle = $"Email claim not received from: {info.LoginProvider}";
+                ViewBag.ErrorMessage = $"Email claim not received from: {info.LoginProvider}";
+
+                return View("Error");
+            }
         }
     }
 }

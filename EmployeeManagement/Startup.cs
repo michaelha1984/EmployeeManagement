@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EmployeeManagement.Models;
+using EmployeeManagement.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -49,19 +50,36 @@ namespace EmployeeManagement
                 options.EnableEndpointRouting = false;
             }).AddXmlDataContractSerializerFormatters();
 
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    //TODO: Secrets manager
+                    options.ClientId = "585158669575-18uo27mfsijjuue1l13t7i8df5tpiemu.apps.googleusercontent.com";
+                    options.ClientSecret = "f6KQMzHkYdASrMAj3TiXjkTF";
+                });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = new PathString("/Administration/AccessDenied");
+            });
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("DeleteRolePolicy", policy =>
-                    policy.RequireClaim("Delete Role"));
+                    policy.RequireAssertion(context =>
+                        context.User.IsInRole("Admin") && context.User.HasClaim(c => c.Type == "Delete Role" && c.Value == "true") ||
+                        context.User.IsInRole("Super Admin")));
 
                 options.AddPolicy("EditRolePolicy", policy =>
-                    policy.RequireClaim("Edit Role"));
+                    policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement()));
 
                 options.AddPolicy("AdminRolePolicy", policy =>
                     policy.RequireRole("Admin"));
             });
 
             services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
+            services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+            services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

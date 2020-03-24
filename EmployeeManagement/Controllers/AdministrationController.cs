@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagement.Controllers
 {
-    [Authorize(Policy = "AdminRolePolicy")]
     public class AdministrationController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
@@ -107,7 +106,6 @@ namespace EmployeeManagement.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         [Authorize(Policy = "EditRolePolicy")]
@@ -239,7 +237,7 @@ namespace EmployeeManagement.Controllers
                 Email = user.Email,
                 UserName = user.UserName,
                 City = user.City,
-                Claims = userClaims.Select(c => c.Value).ToList(),
+                Claims = userClaims.Select(c => $"{c.Type} : {c.Value}").ToList(),
                 Roles = userRoles
             };
 
@@ -342,6 +340,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> ManageUserRoles(string userId)
         {
             ViewBag.UserId = userId;
@@ -378,6 +377,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> ManageUserRoles(List<ManageUserRolesViewModel> modelList, string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
@@ -436,7 +436,7 @@ namespace EmployeeManagement.Controllers
                     ClaimType = claim.Type
                 };
 
-                if (currentUserClaims.Any(c => c.Type == claim.Type))
+                if (currentUserClaims.Any(c => c.Type == claim.Type && c.Value == "true"))
                 {
                     userClaim.IsSelected = true;
                 }
@@ -467,7 +467,7 @@ namespace EmployeeManagement.Controllers
                 return View(model);
             }
 
-            var claimsToAdd = model.UserClaims.Where(m => m.IsSelected).Select(m => new Claim(m.ClaimType, m.ClaimType));
+            var claimsToAdd = model.UserClaims.Select(m => new Claim(m.ClaimType, m.IsSelected ? "true" : "false"));
             var addResult = await userManager.AddClaimsAsync(user, claimsToAdd);
 
             if (!addResult.Succeeded)
@@ -477,6 +477,14 @@ namespace EmployeeManagement.Controllers
             }
 
             return RedirectToAction("EditUser", new { Id = userId });
+        }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }
