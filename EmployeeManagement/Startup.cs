@@ -40,7 +40,9 @@ namespace EmployeeManagement
                 options.Password.RequiredUniqueChars = 3;
 
                 options.SignIn.RequireConfirmedEmail = true;
-            }).AddEntityFrameworkStores<AppDbContext>();
+            })
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
 
             services.AddMvc(options =>
             {
@@ -108,8 +110,6 @@ namespace EmployeeManagement
             {
                 routes.MapRoute(default, "{controller=Home}/{action=Index}/{id?}");
             });
-
-            //app.UseMvc();
         }
     }
 }
