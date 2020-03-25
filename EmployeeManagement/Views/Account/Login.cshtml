@@ -44,7 +44,7 @@
                         @foreach (var provider in Model.ExternalLogins)
                         {
                             <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name"
-                                    title="Login using your @provider.DisplayName account">
+                                    title="Login using your @provider.DisplayName account" style="width: auto;">
                                 @provider.DisplayName
                             </button>
                         }
