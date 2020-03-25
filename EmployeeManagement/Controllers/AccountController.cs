@@ -318,5 +318,39 @@ namespace EmployeeManagement.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPasswordAsync(string email, string token)
+        {
+            if (email == null || token == null)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid password reset token");
+            }
+            
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordViewModel model)
+        {
+            var user = await userManager.FindByEmailAsync(model.Email);
+
+            if (user != null)
+            {
+                var result = await userManager.ResetPasswordAsync(user, model.Token, model.ConfirmPassword);
+                if (result.Succeeded)
+                {
+                    return View("ResetPasswordConfirmation");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
+            return View(model);
+        }
     }
 }
