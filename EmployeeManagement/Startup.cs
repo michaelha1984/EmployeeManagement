@@ -53,14 +53,13 @@ namespace EmployeeManagement
             services.AddAuthentication()
                 .AddGoogle(options =>
                 {
-                    //TODO: Secrets manager
-                    options.ClientId = "585158669575-18uo27mfsijjuue1l13t7i8df5tpiemu.apps.googleusercontent.com";
-                    options.ClientSecret = "f6KQMzHkYdASrMAj3TiXjkTF";
+                    options.ClientId = config["Authentication:Google:ClientId"];
+                    options.ClientSecret = config["Authentication:Google:ClientSecret"];
                 })
                 .AddFacebook(options =>
                 {
-                    options.AppId = "2762270717142576";
-                    options.AppSecret = "fa01e24c67d71b208248d997d4daedd8";
+                    options.AppId = config["Authentication:Facebook:AppId"];
+                    options.AppSecret = config["Authentication:Facebook:AppSecret"];
                 });
 
             services.ConfigureApplicationCookie(options =>
