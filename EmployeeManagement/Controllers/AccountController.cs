@@ -93,8 +93,21 @@ namespace EmployeeManagement.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> LoginAsync(LoginViewModel model, string returnUrl)
         {
+            model.ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
+                var user = await userManager.FindByEmailAsync(model.Email);
+
+                // Check email has been verified by email
+                if (user != null && !user.EmailConfirmed &&
+                    // If verified, check the password is correct at least (to avoid brute attack)
+                    await userManager.CheckPasswordAsync(user, model.Password)) 
+                {
+                    ModelState.AddModelError(string.Empty, "Email address is not confirmed");
+                    return View(model);
+                }
+
                 var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
 
                 if (result.Succeeded)
@@ -167,6 +180,22 @@ namespace EmployeeManagement.Controllers
                 return View("Login", model);
             }
 
+            var email = info.Principal.FindFirst(ClaimTypes.Email).Value;
+            ApplicationUser user;
+            
+            // Check email has been verified by email
+            if (email != null)
+            {
+                user = await userManager.FindByEmailAsync(email);
+
+                if (user != null && !user.EmailConfirmed)
+                {
+                    ModelState.AddModelError(string.Empty, "Email address is not confirmed");
+                    return View("Login",  model);
+                }
+            }
+            
+
             // Try sign in with external login details 
             var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
@@ -177,11 +206,9 @@ namespace EmployeeManagement.Controllers
             }
             else
             { 
-                var email = info.Principal.FindFirst(ClaimTypes.Email).Value;
-
                 if (email != null)
                 {
-                    var user = await userManager.FindByEmailAsync(email);
+                    user = await userManager.FindByEmailAsync(email);
 
                     if (user == null)
                     {
