@@ -286,5 +286,37 @@ namespace EmployeeManagement.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPasswordAsync(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await userManager.FindByEmailAsync(model.Email);
+
+                if (user != null && user.EmailConfirmed)
+                {
+                    var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+                    var link = Url.Action("ResetPassword", "Account", new { model.Email, token }, Request.Scheme); 
+                    logger.LogWarning(link);
+
+                    return View("ForgotPasswordConfirmation");
+                }
+
+                return View("ForgotPasswordConfirmation");
+            }
+
+            return View(model);
+        }
+
     }
 }
