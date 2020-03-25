@@ -207,7 +207,6 @@ namespace EmployeeManagement.Controllers
                 }
             }
             
-
             // Try sign in with external login details 
             var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
@@ -232,6 +231,18 @@ namespace EmployeeManagement.Controllers
                         };
 
                         await userManager.CreateAsync(user);
+
+                        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var confirmationLink = Url.Action("ConfirmEmail", "Account",
+                            new { userId = user.Id, token }, Request.Scheme);
+
+                        logger.LogWarning(confirmationLink);
+
+                        ViewBag.ErrorTitle = "Registration successful";
+                        ViewBag.ErrorMessage = "Before you can login, please confirm your email " +
+                            "by clicking on the confirmation link we have emailed you";
+
+                        return View("Error");
                     }
 
                     // Add user to login and sign in
