@@ -120,7 +120,7 @@ namespace EmployeeManagement.Controllers
                     return View(model);
                 }
 
-                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, true);
 
                 if (result.Succeeded)
                 {
@@ -130,6 +130,11 @@ namespace EmployeeManagement.Controllers
                     }
                      
                     return RedirectToAction("index", "home");
+                }
+
+                if (result.IsLockedOut)
+                {
+                    return View("AccountLocked");
                 }
 
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
@@ -354,8 +359,21 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpGet]
-        public IActionResult ChangePassword()
+        public async Task<IActionResult> ChangePasswordAsync()
         {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var hasPassword = await userManager.HasPasswordAsync(user);
+
+            if (!hasPassword)
+            {
+                return RedirectToAction("AddPassword");
+            }
+
             return View();
         }
 
@@ -393,6 +411,46 @@ namespace EmployeeManagement.Controllers
         public IActionResult ChangePasswordConfirmation()
         {
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult AddPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddPasswordAsync(AddPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return RedirectToAction("Login");
+                }
+
+                var hasPassword = await userManager.HasPasswordAsync(user);
+
+                if (hasPassword)
+                {
+                    return RedirectToAction("ChangePassword");
+                }
+
+                var result = await userManager.AddPasswordAsync(user, model.NewPassword);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                        return View(model);
+                    }
+                }
+
+                return RedirectToAction("ChangePasswordConfirmation");
+            }
+
+            return View(model);
         }
     }
 }
